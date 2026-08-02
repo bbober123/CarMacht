@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co;">
+<title>CarMatch - Leaderboard</title>
+<link rel="stylesheet" href="style.css?v=20260726c">
+<link rel="stylesheet" href="pages.css?v=20260726c">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body class="page-body">
+
+  <div class="page-wrap">
+    <a href="index.html" class="back-link" data-i18n="common.back_discover">← Back to discovering</a>
+    <div class="page-header"><h1 data-i18n="leaderboard.title">🏆 Leaderboard</h1></div>
+    <p class="muted" style="margin:-10px 0 20px;" data-i18n="leaderboard.subtitle">Points: 1 for each liked car, 5 for each badge, 20 for winning a weekly contest.</p>
+
+    <div id="my-rank-card" class="card" style="display:none;"></div>
+
+    <div id="leaderboard-list"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=20260726c"></script>
+  <script src="supabase-client.js?v=20260726c"></script>
+  <script src="i18n.js?v=20260726c"></script>
+  <script src="appearance.js?v=20260726c"></script>
+  <script src="site-settings.js?v=20260726c"></script>
+  <script src="settings-panel.js?v=20260726c"></script>
+  <script src="leaderboard.js?v=20260726c"></script>
+</body>
+</html>
