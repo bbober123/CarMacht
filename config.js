@@ -6,5 +6,5 @@
 // To sa dane PUBLICZNE (widoczne w kodzie przegladarki) - tak ma byc,
 // to nie jest sekret. Bezpieczenstwo zapewniaja polityki RLS w schema.sql.
 
-const SUPABASE_URL = "https://TWOJ-PROJEKT.supabase.co";
-const SUPABASE_ANON_KEY = "TWOJ-ANON-PUBLIC-KEY";
+const SUPABASE_URL = "https://gxauhctsahevudvtnane.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_xrDUzodTc9aQLqBuhs_Asw_3ym3KbpA";
