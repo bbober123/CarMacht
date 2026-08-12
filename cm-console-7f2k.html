@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; base-uri 'self'; form-action 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>CarMatch - panel</title>
+<link rel="stylesheet" href="admin.css?v=20260726">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- EKRAN LOGOWANIA -->
+  <div id="login-screen">
+    <div class="login-box">
+      <h1>CarMatch <span>control</span></h1>
+      <p class="muted">Zaloguj się kontem administratora utworzonym w Supabase (Authentication → Users).</p>
+      <input id="login-email" type="email" placeholder="Email" autocomplete="username">
+      <input id="login-password" type="password" placeholder="Hasło" autocomplete="current-password">
+      <button id="login-btn" class="btn-primary">Zaloguj się</button>
+      <p id="login-error" class="error-text"></p>
+    </div>
+  </div>
+
+  <!-- PANEL -->
+  <div id="admin-panel" class="app-shell" style="display:none;">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><h1>CarMatch <span>control</span></h1></div>
+      <nav id="tabs">
+        <button class="tab-btn active" data-tab="dashboard"><span class="tab-icon">📈</span>Panel startowy</button>
+        <button class="tab-btn" data-tab="cars"><span class="tab-icon">🚗</span>Auta</button>
+        <button class="tab-btn" data-tab="photos"><span class="tab-icon">🖼️</span>Zdjęcia</button>
+        <button class="tab-btn" data-tab="car-submissions"><span class="tab-icon">📥</span>Zgłoszenia aut <span id="badge-cars" class="tab-badge" style="display:none;">0</span></button>
+        <button class="tab-btn" data-tab="photo-submissions"><span class="tab-icon">📸</span>Zgłoszone zdjęcia <span id="badge-photos" class="tab-badge" style="display:none;">0</span></button>
+        <button class="tab-btn" data-tab="users"><span class="tab-icon">👥</span>Użytkownicy</button>
+        <button class="tab-btn" data-tab="badges"><span class="tab-icon">🏅</span>Odznaki</button>
+        <button class="tab-btn" data-tab="contest"><span class="tab-icon">🏆</span>Konkurs</button>
+        <button class="tab-btn" data-tab="feedback"><span class="tab-icon">💬</span>Opinie <span id="badge-feedback" class="tab-badge" style="display:none;">0</span></button>
+        <button class="tab-btn" data-tab="appearance"><span class="tab-icon">🎨</span>Wygląd</button>
+      </nav>
+      <button id="logout-btn" class="btn-secondary sidebar-logout">Wyloguj</button>
+    </aside>
+
+    <main class="content">
+
+    <!-- TAB: AUTA -->
+    <!-- TAB: DASHBOARD -->
+    <section id="tab-dashboard" class="tab-panel">
+      <div id="dashboard-stats" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:14px; margin-bottom:24px;"></div>
+
+      <div class="panel-grid">
+        <div class="card">
+          <h2>Wymaga Twojej uwagi</h2>
+          <div id="dashboard-attention"></div>
+        </div>
+        <div class="card">
+          <h2>Ostatnia aktywność</h2>
+          <div id="dashboard-activity"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-cars" class="tab-panel" style="display:none;">
+      <div class="panel-grid">
+        <div class="card">
+          <h2>Dodaj jedno auto</h2>
+          <form id="add-car-form" class="form-grid">
+            <input name="make" placeholder="Marka *" required>
+            <input name="model" placeholder="Model *" required>
+            <input name="year" type="number" placeholder="Rocznik *" required>
+            <input name="segment" placeholder="Segment (np. SUV) *" required>
+            <input name="country" placeholder="Kraj *" required>
+            <select name="powertrain" required>
+              <option value="">Napęd *</option>
+              <option value="electric">Elektryczny</option>
+              <option value="hybrid">Hybryda</option>
+              <option value="combustion">Spalinowy</option>
+            </select>
+            <input name="engine" placeholder="Silnik (opis) *" required>
+            <select name="drivetrain" required>
+              <option value="">Napęd kół *</option>
+              <option value="FWD">FWD</option>
+              <option value="RWD">RWD</option>
+              <option value="AWD">AWD</option>
+            </select>
+            <input name="powerKw" type="number" placeholder="Moc (kW) *" required>
+            <input name="torqueNm" type="number" placeholder="Moment obrotowy (Nm) *" required>
+            <input name="accel" type="number" step="0.1" placeholder="0-100 (s) *" required>
+            <input name="topSpeed" type="number" placeholder="V max (km/h) *" required>
+            <input name="price" type="number" placeholder="Cena (USD) *" required>
+            <textarea name="description" placeholder="Opis (opcjonalnie)" class="full-width"></textarea>
+            <button type="submit" class="btn-primary full-width">Dodaj auto</button>
+          </form>
+          <p id="add-car-status" class="status-text"></p>
+        </div>
+
+        <div class="card">
+          <h2>Masowe dodawanie (CSV)</h2>
+          <p class="muted">Jedna linia = jedno auto. Kolejność pól:<br>
+          <code>marka,model,rocznik,segment,kraj,napęd,silnik,napęd_kół,moc_kw,moment_nm,przyspieszenie,v_max,cena,opis</code></p>
+          <textarea id="csv-input" rows="8" placeholder="Tesla,Model 3,2024,Sedan,USA,electric,Silnik synchroniczny PM,RWD,260,493,5.6,225,42990,Opis auta"></textarea>
+          <button id="csv-submit-btn" class="btn-primary">Wgraj z CSV</button>
+          <button id="seed-catalog-btn" class="btn-secondary">Wgraj katalog startowy (65 aut)</button>
+          <p id="csv-status" class="status-text"></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Wszystkie auta (<span id="cars-count">0</span>)</h2>
+        <input id="cars-search" placeholder="Szukaj po marce lub modelu..." class="search-input">
+        <div id="cars-table"></div>
+      </div>
+    </section>
+
+    <!-- TAB: ZDJĘCIA -->
+    <section id="tab-photos" class="tab-panel" style="display:none;">
+      <div class="card">
+        <h2>Dodaj zdjęcie do auta</h2>
+        <form id="add-photo-form" class="form-grid">
+          <select name="carId" id="photo-car-select" required class="full-width">
+            <option value="">Wybierz auto...</option>
+          </select>
+          <input name="file" type="file" accept="image/*" required class="full-width">
+          <label class="checkbox-label full-width"><input type="checkbox" name="isPrimary" checked> Ustaw jako zdjęcie główne</label>
+          <button type="submit" class="btn-primary full-width">Prześlij zdjęcie</button>
+        </form>
+        <p id="add-photo-status" class="status-text"></p>
+      </div>
+    </section>
+
+    <!-- TAB: ZGŁOSZENIA AUT -->
+    <section id="tab-car-submissions" class="tab-panel" style="display:none;">
+      <div class="card">
+        <h2>Propozycje nowych aut od użytkowników</h2>
+        <div id="car-submissions-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB: ZGŁOSZONE ZDJĘCIA -->
+    <section id="tab-photo-submissions" class="tab-panel" style="display:none;">
+      <div class="card">
+        <h2>Propozycje zdjęć od użytkowników</h2>
+        <div id="photo-submissions-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB: UŻYTKOWNICY -->
+    <section id="tab-users" class="tab-panel" style="display:none;">
+      <div class="card">
+        <h2>Wszyscy użytkownicy (<span id="users-count">0</span>)</h2>
+        <input id="users-search" placeholder="Szukaj po emailu lub nazwie..." class="search-input">
+        <div id="users-table"></div>
+      </div>
+    </section>
+
+    <!-- TAB: ODZNAKI -->
+    <section id="tab-badges" class="tab-panel" style="display:none;">
+      <div class="panel-grid">
+        <div class="card">
+          <h2>Dodaj nową odznakę</h2>
+          <form id="add-badge-form" class="form-grid">
+            <input name="id" placeholder="ID (np. super-fan) *" required>
+            <input name="icon" placeholder="Emoji (np. 🎖️) *" required>
+            <input name="name" placeholder="Nazwa *" required class="full-width">
+            <textarea name="description" placeholder="Opis *" required class="full-width"></textarea>
+            <button type="submit" class="btn-primary full-width">Dodaj odznakę</button>
+          </form>
+          <p id="add-badge-status" class="status-text"></p>
+        </div>
+
+        <div class="card">
+          <h2>Nadaj odznakę ręcznie</h2>
+          <form id="grant-badge-form" class="form-grid">
+            <select name="userId" id="grant-user-select" class="full-width" required>
+              <option value="">Wybierz użytkownika...</option>
+            </select>
+            <select name="badgeId" id="grant-badge-select" class="full-width" required>
+              <option value="">Wybierz odznakę...</option>
+            </select>
+            <button type="submit" class="btn-primary full-width">Nadaj</button>
+          </form>
+          <p id="grant-badge-status" class="status-text"></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Wszystkie odznaki (<span id="badges-count">0</span>)</h2>
+        <div id="badges-table"></div>
+      </div>
+    </section>
+
+    <!-- TAB: KONKURS -->
+    <section id="tab-contest" class="tab-panel" style="display:none;">
+      <div class="card">
+        <h2>Bieżący tydzień: <span id="contest-slots-label">0 / 30</span></h2>
+        <button id="resolve-contest-btn" class="btn-primary">Rozstrzygnij konkurs teraz</button>
+        <button id="refresh-contest-btn" class="btn-secondary">Odśwież</button>
+        <p id="resolve-contest-status" class="status-text"></p>
+      </div>
+      <div class="card">
+        <h2>Aktywne zgłoszenia</h2>
+        <div id="contest-entries-table"></div>
+      </div>
+    </section>
+
+    <!-- TAB: OPINIE -->
+    <section id="tab-feedback" class="tab-panel" style="display:none;">
+      <div class="card">
+        <h2>Co piszą użytkownicy</h2>
+        <div id="feedback-list"></div>
+      </div>
+    </section>
+
+    <!-- TAB: WYGLĄD -->
+    <section id="tab-appearance" class="tab-panel" style="display:none;">
+      <div class="panel-grid">
+        <div class="card">
+          <h2>Kolory i hasło</h2>
+          <form id="appearance-form" style="display:flex; flex-direction:column; gap:14px;">
+            <div>
+              <label style="font-size:12.5px; font-weight:600; display:block; margin-bottom:6px;">Kolor akcentu</label>
+              <div style="display:flex; gap:10px; align-items:center;">
+                <input type="color" name="accent_color" id="accent-color-input" style="width:48px; height:38px; padding:2px; border-radius:8px; border:1px solid #DEDFDA; cursor:pointer;">
+                <input type="text" id="accent-color-text" style="flex:1; padding:10px 12px; border-radius:8px; border:1px solid #DEDFDA; font-family:'JetBrains Mono',monospace; font-size:13px;">
+              </div>
+              <p class="muted" style="margin-top:6px;">Widoczne na każdej stronie: głównej, logowaniu, profilu, zapisanych, konkursie.</p>
+            </div>
+            <div>
+              <label style="font-size:12.5px; font-weight:600; display:block; margin-bottom:6px;">Hasło na ekranie powitalnym</label>
+              <input type="text" name="tagline" id="tagline-input" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid #DEDFDA; font-size:13.5px;">
+            </div>
+            <button type="submit" class="btn-primary full-width">Zapisz</button>
+          </form>
+          <p id="appearance-status" class="status-text"></p>
+        </div>
+
+        <div class="card">
+          <h2>Logo strony</h2>
+          <p class="muted" style="margin-bottom:14px;">Podmienia logo widoczne w pasku górnym, na ekranie logowania i w onboardingu - na całej stronie, od razu.</p>
+          <div style="display:flex; gap:20px; margin-bottom:16px;">
+            <div style="text-align:center;">
+              <div style="width:64px; height:64px; border-radius:12px; background:#14161A; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;">
+                <img id="logo-dark-preview" src="logo-dark.png" style="max-width:44px; max-height:44px;">
+              </div>
+              <label class="muted" style="font-size:11px;">Wersja ciemna (tryb dark)</label><br>
+              <input type="file" id="logo-dark-file" accept="image/png,image/svg+xml" style="font-size:11px; margin-top:6px;">
+            </div>
+            <div style="text-align:center;">
+              <div style="width:64px; height:64px; border-radius:12px; background:#F3F4F1; border:1px solid #DEDFDA; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;">
+                <img id="logo-light-preview" src="logo-light.png" style="max-width:44px; max-height:44px;">
+              </div>
+              <label class="muted" style="font-size:11px;">Wersja jasna (tryb light)</label><br>
+              <input type="file" id="logo-light-file" accept="image/png,image/svg+xml" style="font-size:11px; margin-top:6px;">
+            </div>
+          </div>
+          <button id="upload-logo-btn" class="btn-primary full-width">Wgraj i zastosuj</button>
+          <p id="logo-upload-status" class="status-text"></p>
+        </div>
+      </div>
+
+      <div class="card" style="max-width:520px;">
+        <h2>Baner z komunikatem</h2>
+        <p class="muted" style="margin-bottom:14px;">Pasek na górze każdej strony, np. o przerwie technicznej albo nowym konkursie. Użytkownik może go zamknąć (wraca dopiero po zmianie treści).</p>
+        <form id="banner-form" style="display:flex; flex-direction:column; gap:12px;">
+          <label class="checkbox-label"><input type="checkbox" id="banner-enabled-input"> Pokazuj baner</label>
+          <input type="text" id="banner-text-input" placeholder="Treść komunikatu..." style="padding:10px 12px; border-radius:8px; border:1px solid #DEDFDA; font-size:13.5px;">
+          <button type="submit" class="btn-primary full-width">Zapisz baner</button>
+        </form>
+        <p id="banner-status" class="status-text"></p>
+      </div>
+    </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=20260726"></script>
+  <script src="cars-data.js?v=20260726"></script>
+  <script src="admin.js?v=20260726"></script>
+</body>
+</html>

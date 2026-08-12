@@ -1,0 +1,14 @@
+{
+  "name": "carmacht",
+  "version": "1.0.0",
+  "description": "CarMatch app",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "build": "echo 'No build required'",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

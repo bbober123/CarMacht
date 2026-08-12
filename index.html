@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.supabase.co; base-uri 'self'; form-action 'self';">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>CarMatch</title>
+<link rel="stylesheet" href="style.css?v=20260726c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div id="phone">
+
+    <div id="error-banner" style="display:none;"></div>
+
+    <!-- EKRAN ONBOARDINGU -->
+    <div id="onboard-screen">
+      <div id="progress-bar"></div>
+      <div id="onboard-body"></div>
+    </div>
+
+    <!-- EKRAN GŁÓWNY (SWIPE DECK) -->
+    <div id="deck-screen" style="display:none;">
+      <div id="top-bar">
+        <img id="logo-img" class="site-logo" src="logo-dark.png" alt="CarMatch" />
+        <div id="top-bar-actions">
+          <button id="propose-car-btn" data-i18n-aria-label="topbar.propose_car_aria" aria-label="Suggest a new car">＋</button>
+          <button id="theme-btn" data-i18n-aria-label="topbar.theme_aria" aria-label="Switch theme">🌙</button>
+        </div>
+      </div>
+      <div id="car-of-day-banner" style="display:none;"></div>
+      <div id="deck"></div>
+      <div id="swipe-buttons">
+        <button id="nope-btn" aria-label="Pas">✕</button>
+        <button id="like-btn" aria-label="Lubię">♥</button>
+      </div>
+      <div id="bottom-nav">
+        <button class="nav-item active" data-tab="discover">
+          <span class="nav-icon">🧭</span><span data-i18n="nav.discover">Discover</span>
+        </button>
+        <a class="nav-item" href="contest.html">
+          <span class="nav-icon">🏆</span><span data-i18n="nav.contest">Contest</span>
+        </a>
+        <a class="nav-item" href="leaderboard.html">
+          <span class="nav-icon">📊</span><span data-i18n="nav.leaderboard">Leaderboard</span>
+        </a>
+        <a class="nav-item" href="saved.html">
+          <span class="nav-icon">🔖</span><span data-i18n="nav.saved">Saved</span>
+          <span id="liked-badge" class="badge" style="display:none;">0</span>
+        </a>
+        <a class="nav-item" href="profile.html">
+          <span class="nav-icon">👤</span><span data-i18n="nav.profile">Profile</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL: ZAPROPONUJ NOWE AUTO -->
+  <div id="propose-car-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 data-i18n="modal.propose_car_title">Suggest a car</h2>
+        <button class="modal-close" data-close="propose-car-modal">✕</button>
+      </div>
+      <form id="propose-car-form">
+        <input name="make" data-i18n-placeholder="modal.make_ph" placeholder="Make *" required>
+        <input name="model" data-i18n-placeholder="modal.model_ph" placeholder="Model *" required>
+        <input name="year" type="number" data-i18n-placeholder="modal.year_ph" placeholder="Year">
+        <input name="segment" data-i18n-placeholder="modal.segment_ph" placeholder="Segment (e.g. SUV)">
+        <input name="country" data-i18n-placeholder="modal.country_ph" placeholder="Country of origin">
+        <select name="powertrain">
+          <option value="" data-i18n="modal.powertrain_select_ph">Powertrain type</option>
+          <option value="electric" data-i18n="powertrain.electric">Electric</option>
+          <option value="hybrid" data-i18n="powertrain.hybrid">Hybrid</option>
+          <option value="combustion" data-i18n="powertrain.combustion">Combustion</option>
+        </select>
+        <textarea name="description" data-i18n-placeholder="modal.description_ph_optional" placeholder="Why should we add it? (optional)"></textarea>
+        <input name="file" type="file" accept="image/*">
+        <button type="submit" class="btn-primary" data-i18n="modal.submit_propose_car">Send suggestion</button>
+        <p class="modal-status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: ZAPROPONUJ ZDJĘCIE DO AUTA -->
+  <div id="propose-photo-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="propose-photo-title" data-i18n="modal.propose_photo_title">Add a photo</h2>
+        <button class="modal-close" data-close="propose-photo-modal">✕</button>
+      </div>
+      <form id="propose-photo-form">
+        <input name="file" type="file" accept="image/*" required>
+        <button type="submit" class="btn-primary" data-i18n="modal.submit_propose_photo">Send photo</button>
+        <p class="modal-status"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: PEŁNY OPIS AUTA -->
+  <div id="description-modal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span></span>
+        <button class="modal-close" data-close="description-modal">✕</button>
+      </div>
+      <div id="description-modal-body"></div>
+    </div>
+  </div>
+
+  <p id="footer-note">
+    <span data-i18n="footer.liked_label">Liked: </span><span id="liked-count">0</span> ·
+    <button id="restart-btn" data-i18n="onboard.change_prefs">change preferences</button>
+  </p>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js?v=20260726c"></script>
+  <script src="supabase-client.js?v=20260726c"></script>
+  <script src="i18n.js?v=20260726c"></script>
+  <script src="appearance.js?v=20260726c"></script>
+  <script src="site-settings.js?v=20260726c"></script>
+  <script src="settings-panel.js?v=20260726c"></script>
+  <script src="car-modals.js?v=20260726c"></script>
+  <script src="script.js?v=20260726c"></script>
+</body>
+</html>
